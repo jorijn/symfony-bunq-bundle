@@ -8,6 +8,5 @@ class BunqController extends Controller
 {
     public function callbackAction()
     {
-
     }
 }
