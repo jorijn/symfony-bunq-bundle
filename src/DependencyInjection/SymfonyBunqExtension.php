@@ -20,6 +20,12 @@ class SymfonyBunqExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('bunq.environment', $config['environment']);
+        $container->setParameter(
+            'bunq.configuration_file',
+            $config['environment'] === 'production' ? $config['production_config_location'] : $config['sandbox_config_location']
+        );
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
     }

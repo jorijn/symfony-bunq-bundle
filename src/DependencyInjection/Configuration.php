@@ -2,6 +2,7 @@
 
 namespace Jorijn\SymfonyBunqBundle\DependencyInjection;
 
+use bunq\Util\BunqEnumApiEnvironmentType;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -19,13 +20,13 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('symfony_bunq');
 
         $rootNode->children()
-            ->arrayNode('context_files')
-                ->children()
-                    ->scalarNode('sandbox')->end()
-                    ->scalarNode('production')->end()
-                ->end()
-            ->end()
-        ->end();
+            ->scalarNode('production_config_location')->defaultValue('%kernel.project_dir%/bunq-production.conf')->end()
+            ->scalarNode('sandbox_config_location')->defaultValue('%kernel.project_dir%/bunq-sandbox.conf')->end()
+            ->enumNode('environment')->values([
+                BunqEnumApiEnvironmentType::CHOICE_PRODUCTION,
+                BunqEnumApiEnvironmentType::CHOICE_SANDBOX,
+            ])->defaultValue(BunqEnumApiEnvironmentType::CHOICE_PRODUCTION)->end()
+            ->end();
 
         return $treeBuilder;
     }
