@@ -18,9 +18,14 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('symfony_bunq');
 
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $rootNode->children()
+            ->arrayNode('context_files')
+                ->children()
+                    ->scalarNode('sandbox')->end()
+                    ->scalarNode('production')->end()
+                ->end()
+            ->end()
+        ->end();
 
         return $treeBuilder;
     }

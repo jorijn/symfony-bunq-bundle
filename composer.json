@@ -4,7 +4,9 @@
     "type": "library",
     "require": {
         "symfony/symfony": "3.4.*",
-        "bunq/sdk_php": ">=0.13.1 <0.14.0"
+        "bunq/sdk_php": ">=0.13.1 <0.14.0",
+        "bacon/bacon-qr-code": ">=1.0 <2.0.0",
+        "php": "^7.0.13"
     },
     "require-dev": {
         "phpunit/phpunit": ">=7.1 <8.0.0",
@@ -12,7 +14,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Jorijn\\": "src/"
+            "Jorijn\\SymfonyBunqBundle\\": "src/"
         }
     },
     "autoload-dev": {

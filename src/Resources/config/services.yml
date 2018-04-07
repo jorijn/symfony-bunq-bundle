@@ -1,1 +1,15 @@
 services:
+  symfony_bunq.commands.test_qr_code:
+    class: Jorijn\SymfonyBunqBundle\Command\TestQrCodeCommand
+    arguments:
+      - "@symfony_bunq.component.qr_codes.terminal_writer"
+    tags:
+      - { name: "console.command", command: "bunq:test_qr_code" }
+
+  symfony_bunq.component.qr_codes.renderer.terminal:
+    class: Jorijn\SymfonyBunqBundle\Component\BaconQrCode\Renderer\Terminal
+
+  symfony_bunq.component.qr_codes.terminal_writer:
+    class: BaconQrCode\Writer
+    arguments:
+      - "@symfony_bunq.component.qr_codes.renderer.terminal"
