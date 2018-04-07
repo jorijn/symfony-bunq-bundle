@@ -41,6 +41,8 @@ class InitializeBunqApiCommand extends Command
     }
 
     /**
+     * TODO: extend the InstallationUtil class because they echo error messages and I want to programmatically process them.
+     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
@@ -53,7 +55,7 @@ class InitializeBunqApiCommand extends Command
         $apiKey = null;
 
         if (BunqEnumApiEnvironmentType::CHOICE_PRODUCTION === $this->environment) {
-            $question = new Question('Please enter your bunq API key', null);
+            $question = new Question('Please enter your bunq API key: ', null);
             do {
                 $apiKey = $asker->ask($input, $output, $question);
             } while (null === $apiKey);
@@ -65,6 +67,11 @@ class InitializeBunqApiCommand extends Command
                 $this->configurationFile,
                 $apiKey
             );
+
+            $output->writeln(sprintf(
+                'Succesfully installed the bunq API key to <info>%s</info>, do not forget to protect this file and to erase your copy/pasted data.',
+                $this->configurationFile
+            ));
         } catch (BunqException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }

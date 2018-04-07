@@ -2,6 +2,7 @@
 
 namespace Jorijn\SymfonyBunqBundle\DependencyInjection;
 
+use bunq\Util\BunqEnumApiEnvironmentType;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -23,7 +24,9 @@ class SymfonyBunqExtension extends Extension
         $container->setParameter('bunq.environment', $config['environment']);
         $container->setParameter(
             'bunq.configuration_file',
-            $config['environment'] === 'production' ? $config['production_config_location'] : $config['sandbox_config_location']
+            BunqEnumApiEnvironmentType::CHOICE_PRODUCTION === $config['environment']
+                ? $config['production_config_location']
+                : $config['sandbox_config_location']
         );
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
