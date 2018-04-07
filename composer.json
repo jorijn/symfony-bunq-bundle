@@ -1,0 +1,39 @@
+{
+    "name": "jorijn/symfony-bunq-bundle",
+    "description": "A Symfony 3.4 LTS compatible Bundle for interaction with the European bunq bank",
+    "type": "library",
+    "require": {
+        "symfony/symfony": "3.4.*",
+        "bunq/sdk_php": ">=0.13.1 <0.14.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=7.1 <8.0.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Jorijn\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Jorijn\\": "tests/Jorijn/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "license": "MIT",
+    "scripts": {
+        "test": "bin/phpunit --coverage-text;"
+    },
+    "authors": [
+        {
+            "name": "Jorijn Schrijvershof",
+            "email": "jorijn@jorijn.com"
+        }
+    ],
+    "extra": {
+      "branch-alias": {
+          "dev-master": "1.0-dev"
+      }
+    }
+}
