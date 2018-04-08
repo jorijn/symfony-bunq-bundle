@@ -20,12 +20,29 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('jorijn_symfony_bunq');
 
         $rootNode->children()
-            ->scalarNode('production_config_location')->defaultValue('%kernel.project_dir%/bunq-production.conf')->end()
-            ->scalarNode('sandbox_config_location')->defaultValue('%kernel.project_dir%/bunq-sandbox.conf')->end()
-            ->enumNode('environment')->values([
+            ->scalarNode('production_config_location')
+            ->defaultValue('%kernel.project_dir%/bunq-production.conf')
+            ->end()
+            ->scalarNode('sandbox_config_location')
+            ->defaultValue('%kernel.project_dir%/bunq-sandbox.conf')
+            ->end()
+            ->enumNode('environment')
+            ->values([
                 BunqEnumApiEnvironmentType::CHOICE_PRODUCTION,
                 BunqEnumApiEnvironmentType::CHOICE_SANDBOX,
-            ])->defaultValue(BunqEnumApiEnvironmentType::CHOICE_PRODUCTION)->end()
+            ])
+            ->defaultValue(BunqEnumApiEnvironmentType::CHOICE_PRODUCTION)
+            ->end()
+            ->scalarNode('application_description')
+            ->defaultValue(\gethostname())
+            ->end()
+            ->arrayNode('allowed_ips')
+            ->arrayPrototype()
+            ->children()
+            ->scalarNode('ip')
+            ->end()
+            ->end()
+            ->end()
             ->end();
 
         return $treeBuilder;
