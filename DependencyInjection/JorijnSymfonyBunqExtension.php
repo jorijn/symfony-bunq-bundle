@@ -16,6 +16,8 @@ class JorijnSymfonyBunqExtension extends Extension
     /**
      * {@inheritdoc}
      */
+    const SYMFONY_BUNQ_COMMANDS_INITIALIZE_BUNQ = 'symfony_bunq.commands.initialize_bunq';
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -28,6 +30,10 @@ class JorijnSymfonyBunqExtension extends Extension
                 ? $config['production_config_location']
                 : $config['sandbox_config_location']
         );
+        $container->setParameter('bunq.application_description', $config['application_description']);
+        $container->setParameter('bunq.allowed_ips', \array_map(function($node) {
+            return $node['ip'];
+        }, $config['allowed_ips']));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');

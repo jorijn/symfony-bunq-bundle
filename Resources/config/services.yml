@@ -9,10 +9,13 @@ services:
   symfony_bunq.commands.initialize_bunq:
       class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
       arguments:
+        - "bunq:initialize"
         - "%bunq.environment%"
         - "%bunq.configuration_file%"
+        - "%bunq.application_description%"
+        - "%bunq.allowed_ips%"
       tags:
-        - { name: "console.command", command: "bunq:initialize" }
+        - { name: "console.command" }
 
   symfony_bunq.component.qr_codes.renderer.terminal:
     class: Jorijn\SymfonyBunqBundle\Component\BaconQrCode\Renderer\Terminal

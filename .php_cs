@@ -20,6 +20,6 @@ return Config::create()
     ])
     ->setFinder(
         Finder::create()
-            ->in(__DIR__.'/src')
-            ->in(__DIR__.'/tests')
+            ->in(__DIR__)
+            ->name('*.php')
     );
