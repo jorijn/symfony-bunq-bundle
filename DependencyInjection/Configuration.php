@@ -17,7 +17,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('symfony_bunq');
+        $rootNode = $treeBuilder->root('jorijn_symfony_bunq');
 
         $rootNode->children()
             ->scalarNode('production_config_location')->defaultValue('%kernel.project_dir%/bunq-production.conf')->end()

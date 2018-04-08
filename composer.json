@@ -19,13 +19,16 @@
         "friendsofphp/php-cs-fixer": "^2.11"
     },
     "autoload": {
-        "psr-0": {
-            "Jorijn\\SymfonyBunqBundle\\": "./src/"
-        }
+        "psr-4": {
+            "Jorijn\\SymfonyBunqBundle\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\Jorijn\\SymfonyBunqBundle\\": "./tests/"
+            "Tests\\Jorijn\\SymfonyBunqBundle\\": "Tests/"
         }
     },
     "minimum-stability": "stable",

@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 /**
  * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class SymfonyBunqExtension extends Extension
+class JorijnSymfonyBunqExtension extends Extension
 {
     /**
      * {@inheritdoc}
