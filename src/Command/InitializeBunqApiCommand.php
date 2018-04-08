@@ -41,8 +41,6 @@ class InitializeBunqApiCommand extends Command
     }
 
     /**
-     * TODO: extend the InstallationUtil class because they echo error messages and I want to programmatically process them.
-     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
@@ -72,7 +70,7 @@ class InitializeBunqApiCommand extends Command
                 'Succesfully installed the bunq API key to <info>%s</info>, do not forget to protect this file and to erase your copy/pasted data.',
                 $this->configurationFile
             ));
-        } catch (BunqException $e) {
+        } catch (\Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
     }
