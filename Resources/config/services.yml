@@ -17,6 +17,13 @@ services:
       tags:
         - { name: "console.command" }
 
+  symfony_bunq.commands.list_current_user:
+        class: Jorijn\SymfonyBunqBundle\Command\ListCurrentUserCommand
+        arguments:
+          - "bunq:current_user"
+        tags:
+          - { name: "console.command" }
+
   symfony_bunq.component.qr_codes.renderer.terminal:
     class: Jorijn\SymfonyBunqBundle\Component\BaconQrCode\Renderer\Terminal
 
