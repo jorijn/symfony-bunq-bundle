@@ -2,9 +2,6 @@
 
 namespace Jorijn\SymfonyBunqBundle\Command;
 
-use bunq\Model\Generated\Endpoint\UserCompany;
-use bunq\Model\Generated\Endpoint\UserLight;
-use bunq\Model\Generated\Endpoint\UserPerson;
 use Jorijn\SymfonyBunqBundle\Model\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,14 +26,6 @@ class ListCurrentUserCommand extends Command
     }
 
     /**
-     * @return UserCompany|UserLight|UserPerson
-     */
-    public function getCurrentUser()
-    {
-        return $this->currentUser;
-    }
-
-    /**
      * Configures the Command instance.
      */
     protected function configure()
@@ -52,6 +41,19 @@ class ListCurrentUserCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        dump($this->currentUser);
+        $bunqUser = $this->getCurrentUser()->getBunqUser();
+
+        /** @var Pointer $pointer */
+        foreach ($bunqUser->getAlias() as $pointer) {
+            $output->writeln(\sprintf('<info>%s</info>: %s', $pointer->getType(), $pointer->getValue()));
+        }
+    }
+
+    /**
+     * @return User
+     */
+    public function getCurrentUser(): User
+    {
+        return $this->currentUser;
     }
 }
