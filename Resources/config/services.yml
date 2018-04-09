@@ -2,27 +2,28 @@ services:
   symfony_bunq.commands.test_qr_code:
     class: Jorijn\SymfonyBunqBundle\Command\TestQrCodeCommand
     arguments:
-      - "@symfony_bunq.component.qr_codes.terminal_writer"
+      - '@symfony_bunq.component.qr_codes.terminal_writer'
     tags:
-      - { name: "console.command", command: "bunq:test_qr_code" }
+      - { name: 'console.command', command: 'bunq:test_qr_code' }
 
   symfony_bunq.commands.initialize_bunq:
-      class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
-      arguments:
-        - "bunq:initialize"
-        - "%bunq.environment%"
-        - "%bunq.configuration_file%"
-        - "%bunq.application_description%"
-        - "%bunq.allowed_ips%"
-      tags:
-        - { name: "console.command" }
+    class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
+    arguments:
+      - 'bunq:initialize'
+      - '%bunq.environment%'
+      - '%bunq.configuration_file%'
+      - '%bunq.application_description%'
+      - '%bunq.allowed_ips%'
+    tags:
+      - { name: 'console.command' }
 
   symfony_bunq.commands.list_current_user:
-        class: Jorijn\SymfonyBunqBundle\Command\ListCurrentUserCommand
-        arguments:
-          - "bunq:current_user"
-        tags:
-          - { name: "console.command" }
+    class: Jorijn\SymfonyBunqBundle\Command\ListCurrentUserCommand
+    arguments:
+      - 'bunq:current_user'
+      - '@symfony_bunq.model.current_user'
+    tags:
+      - { name: 'console.command' }
 
   symfony_bunq.component.qr_codes.renderer.terminal:
     class: Jorijn\SymfonyBunqBundle\Component\BaconQrCode\Renderer\Terminal
@@ -30,4 +31,17 @@ services:
   symfony_bunq.component.qr_codes.terminal_writer:
     class: BaconQrCode\Writer
     arguments:
-      - "@symfony_bunq.component.qr_codes.renderer.terminal"
+      - '@symfony_bunq.component.qr_codes.renderer.terminal'
+
+  symfony_bunq.factory.bunq:
+    class: Jorijn\SymfonyBunqBundle\Factory\bunqFactory
+
+  symfony_bunq.api.api_context:
+    factory: 'symfony_bunq.factory.bunq:restoreApi'
+    arguments:
+      - '%bunq.configuration_file%'
+
+  symfony_bunq.model.current_user:
+    factory: 'symfony_bunq.factory.bunq:currentUser'
+    arguments:
+      - '@symfony_bunq.api.api_context'
