@@ -4,7 +4,18 @@ services:
     arguments:
       - '@symfony_bunq.component.qr_codes.terminal_writer'
     tags:
-      - { name: 'console.command', command: 'bunq:test_qr_code' }
+      - { name: 'console.command', command: 'bunq:test-qr-code' }
+
+  symfony_bunq.commands.callback_url:
+    class: Jorijn\SymfonyBunqBundle\Command\CallbackUrlCommand
+    arguments:
+      - 'bunq:callback-url'
+      - "@symfony_bunq.model.current_user"
+      - "@router"
+    calls:
+      - { method: 'setApiContext', arguments: ['@symfony_bunq.api.api_context'] }
+    tags:
+      - { name: 'console.command' }
 
   symfony_bunq.commands.initialize_bunq:
     class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
@@ -20,7 +31,7 @@ services:
   symfony_bunq.commands.list_current_user:
     class: Jorijn\SymfonyBunqBundle\Command\ListCurrentUserCommand
     arguments:
-      - 'bunq:current_user'
+      - 'bunq:current-user'
       - '@symfony_bunq.model.current_user'
     tags:
       - { name: 'console.command' }
