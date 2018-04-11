@@ -17,6 +17,15 @@ services:
     tags:
       - { name: 'console.command' }
 
+  symfony_bunq.commands.list_accounts:
+    class: Jorijn\SymfonyBunqBundle\Command\ListAccountsCommand
+    arguments:
+      - 'bunq:list-accounts'
+    calls:
+      - { method: 'setApiContext', arguments: ['@symfony_bunq.api.api_context'] }
+    tags:
+      - { name: 'console.command' }
+
   symfony_bunq.commands.initialize_bunq:
     class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
     arguments:
@@ -49,10 +58,12 @@ services:
 
   symfony_bunq.api.api_context:
     factory: 'symfony_bunq.factory.bunq:restoreApi'
+    class: bunq\Context\ApiContext
     arguments:
       - '%bunq.configuration_file%'
 
   symfony_bunq.model.current_user:
     factory: 'symfony_bunq.factory.bunq:currentUser'
+    class: Jorijn\SymfonyBunqBundle\Model\User
     arguments:
       - '@symfony_bunq.api.api_context'
