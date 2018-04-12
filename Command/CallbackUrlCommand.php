@@ -33,8 +33,8 @@ class CallbackUrlCommand extends Command
     /**
      * ListCurrentUserCommand constructor.
      *
-     * @param string $name
-     * @param User $user
+     * @param string          $name
+     * @param User            $user
      * @param RouterInterface $router
      */
     public function __construct(string $name, User $user, RouterInterface $router)
@@ -54,7 +54,7 @@ class CallbackUrlCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return int|null|void
@@ -88,8 +88,7 @@ class CallbackUrlCommand extends Command
             }
 
             $output->writeln('<info>New status successfully applied.</info>');
-        }
-        catch (BunqException $exception) {
+        } catch (BunqException $exception) {
             $output->writeln('<error>An error occured while applying new status: '.$exception->getMessage().'</error>');
         }
     }
@@ -101,8 +100,8 @@ class CallbackUrlCommand extends Command
         /** @var NotificationFilter $filter */
         foreach ($allCurrentNotificationFilter as $filter) {
             if (
-                $filter->getCategory() === self::NOTIFICATION_CATEGORY_MUTATION
-                && $filter->getNotificationDeliveryMethod() === self::NOTIFICATION_DELIVERY_METHOD_URL
+                self::NOTIFICATION_CATEGORY_MUTATION === $filter->getCategory()
+                && self::NOTIFICATION_DELIVERY_METHOD_URL === $filter->getNotificationDeliveryMethod()
                 && $filter->getNotificationTarget() === $this->getUrl()
             ) {
                 return true;
@@ -133,6 +132,7 @@ class CallbackUrlCommand extends Command
 
     /**
      * @param $callbackUrl
+     *
      * @return NotificationFilter[]
      */
     protected function getExistingFiltersWithoutCurrentCallback(string $callbackUrl): array
@@ -145,6 +145,7 @@ class CallbackUrlCommand extends Command
                 $allUpdatedNotificationFilter[] = $notificationFilter;
             }
         }
+
         return $allUpdatedNotificationFilter;
     }
 
@@ -156,16 +157,53 @@ class CallbackUrlCommand extends Command
         switch (\get_class($this->user)) {
             case UserPerson::class:
                 UserPerson::update(
-                    null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
                     $allUpdatedNotificationFilter
                 );
                 break;
             case UserCompany::class:
                 UserCompany::update(
-                    null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
                     $allUpdatedNotificationFilter
                 );
                 break;

@@ -31,7 +31,7 @@ class JorijnSymfonyBunqExtension extends Extension
                 : $config['sandbox_config_location']
         );
         $container->setParameter('bunq.application_description', $config['application_description']);
-        $container->setParameter('bunq.allowed_ips', \array_map(function($node) {
+        $container->setParameter('bunq.allowed_ips', \array_map(function ($node) {
             return $node['ip'];
         }, $config['allowed_ips']));
 
