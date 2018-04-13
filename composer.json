@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "symfony/symfony": "3.4.*",
-        "bunq/sdk_php": "0.13.*",
+        "bunq/sdk_php": "dev-develop", //"0.13.*",
         "bacon/bacon-qr-code": ">=1.0 <2.0.0",
         "php": "^7.0.13"
     },
