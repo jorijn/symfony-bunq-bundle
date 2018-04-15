@@ -1,19 +1,10 @@
 services:
-  symfony_bunq.commands.test_qr_code:
-    class: Jorijn\SymfonyBunqBundle\Command\TestQrCodeCommand
-    arguments:
-      - '@symfony_bunq.component.qr_codes.terminal_writer'
-    tags:
-      - { name: 'console.command', command: 'bunq:test-qr-code' }
-
   symfony_bunq.commands.callback_url:
     class: Jorijn\SymfonyBunqBundle\Command\CallbackUrlCommand
     arguments:
       - 'bunq:callback-url'
-      - "@symfony_bunq.model.current_user"
+      - '@symfony_bunq.component.command.api_helper'
       - "@router"
-    calls:
-      - { method: 'setApiContext', arguments: ['@symfony_bunq.api.api_context'] }
     tags:
       - { name: 'console.command' }
 
@@ -21,8 +12,7 @@ services:
     class: Jorijn\SymfonyBunqBundle\Command\ListAccountsCommand
     arguments:
       - 'bunq:list-accounts'
-    calls:
-      - { method: 'setApiContext', arguments: ['@symfony_bunq.api.api_context'] }
+      - '@symfony_bunq.component.command.api_helper'
     tags:
       - { name: 'console.command' }
 
@@ -30,6 +20,7 @@ services:
     class: Jorijn\SymfonyBunqBundle\Command\InitializeBunqApiCommand
     arguments:
       - 'bunq:initialize'
+      - '@symfony_bunq.component.command.api_helper'
       - '%bunq.environment%'
       - '%bunq.configuration_file%'
       - '%bunq.application_description%'
@@ -41,29 +32,15 @@ services:
     class: Jorijn\SymfonyBunqBundle\Command\ListCurrentUserCommand
     arguments:
       - 'bunq:current-user'
-      - '@symfony_bunq.model.current_user'
+      - '@symfony_bunq.component.command.api_helper'
     tags:
       - { name: 'console.command' }
 
-  symfony_bunq.component.qr_codes.renderer.terminal:
-    class: Jorijn\SymfonyBunqBundle\Component\BaconQrCode\Renderer\Terminal
-
-  symfony_bunq.component.qr_codes.terminal_writer:
-    class: BaconQrCode\Writer
-    arguments:
-      - '@symfony_bunq.component.qr_codes.renderer.terminal'
-
-  symfony_bunq.factory.bunq:
-    class: Jorijn\SymfonyBunqBundle\Factory\bunqFactory
-
-  symfony_bunq.api.api_context:
-    factory: 'symfony_bunq.factory.bunq:restoreApi'
-    class: bunq\Context\ApiContext
+  symfony_bunq.component.command.api_helper:
+    class: Jorijn\SymfonyBunqBundle\Component\Command\ApiHelper
     arguments:
       - '%bunq.configuration_file%'
+      - '@symfony_bunq.component.crypt.aes_256_cbc'
 
-  symfony_bunq.model.current_user:
-    factory: 'symfony_bunq.factory.bunq:currentUser'
-    class: Jorijn\SymfonyBunqBundle\Model\User
-    arguments:
-      - '@symfony_bunq.api.api_context'
+  symfony_bunq.component.crypt.aes_256_cbc:
+    class: Jorijn\SymfonyBunqBundle\Component\CryptAes256Cbc

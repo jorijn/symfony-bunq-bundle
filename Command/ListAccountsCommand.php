@@ -4,14 +4,15 @@ namespace Jorijn\SymfonyBunqBundle\Command;
 
 use bunq\Model\Generated\Endpoint\MonetaryAccount;
 use bunq\Model\Generated\Endpoint\MonetaryAccountBank;
+use bunq\Model\Generated\Endpoint\MonetaryAccountJoint;
+use bunq\Model\Generated\Endpoint\MonetaryAccountLight;
 use bunq\Model\Generated\Object\Pointer;
+use Jorijn\SymfonyBunqBundle\Component\Command\ApiHelper;
 use Jorijn\SymfonyBunqBundle\Component\Traits\ApiContextAwareTrait;
-use Jorijn\SymfonyBunqBundle\Model\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class ListAccountsCommand extends Command
 {
@@ -19,17 +20,21 @@ class ListAccountsCommand extends Command
 
     const IBAN = 'IBAN';
     const UNKNOWN = 'UNKNOWN';
+    /**
+     * @var ApiHelper
+     */
+    private $apiHelper;
 
     /**
      * ListAccountsCommand constructor.
      *
-     * @param string          $name
-     * @param User            $user
-     * @param RouterInterface $router
+     * @param string    $name
+     * @param ApiHelper $apiHelper
      */
-    public function __construct(string $name)
+    public function __construct(string $name, ApiHelper $apiHelper)
     {
         parent::__construct($name);
+        $this->apiHelper = $apiHelper;
     }
 
     /**
@@ -48,10 +53,15 @@ class ListAccountsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->apiHelper->restore($this->getHelper('question'), $input, $output)) {
+            return;
+        }
+
         $table = new Table($output);
         $table->setHeaders(['ID', 'Description', 'IBAN', 'Balance']);
         $table->setRows(array_map(function (MonetaryAccount $account) {
-            $bankAccount = $account->getMonetaryAccountBank();
+            /** @var MonetaryAccountBank|MonetaryAccountJoint|MonetaryAccountLight $bankAccount */
+            $bankAccount = $account->getReferencedObject();
 
             return [
                 $bankAccount->getId(),

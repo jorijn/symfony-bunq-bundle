@@ -5,6 +5,7 @@ namespace Jorijn\SymfonyBunqBundle\Command;
 use bunq\Context\ApiContext;
 use bunq\Util\BunqEnumApiEnvironmentType;
 use bunq\Util\InstallationUtil;
+use Jorijn\SymfonyBunqBundle\Component\Command\ApiHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,18 +31,24 @@ class InitializeBunqApiCommand extends Command
      * @var array
      */
     private $allowedIps;
+    /**
+     * @var ApiHelper
+     */
+    private $apiHelper;
 
     /**
      * InitializeBunqApiCommand constructor.
      *
-     * @param string $name
-     * @param string $environment
-     * @param string $configurationFile
-     * @param string $applicationDescription
-     * @param array  $allowedIps
+     * @param string    $name
+     * @param ApiHelper $apiHelper
+     * @param string    $environment
+     * @param string    $configurationFile
+     * @param string    $applicationDescription
+     * @param array     $allowedIps
      */
     public function __construct(
         string $name,
+        ApiHelper $apiHelper,
         string $environment,
         string $configurationFile,
         string $applicationDescription = '',
@@ -53,6 +60,7 @@ class InitializeBunqApiCommand extends Command
         $this->configurationFile = $configurationFile;
         $this->applicationDescription = $applicationDescription;
         $this->allowedIps = $allowedIps;
+        $this->apiHelper = $apiHelper;
     }
 
     /**
@@ -90,6 +98,8 @@ class InitializeBunqApiCommand extends Command
 
         try {
             $environmentType = new BunqEnumApiEnvironmentType($this->environment);
+            $tempfile = tempnam(\sys_get_temp_dir(), 'bunq_');
+
             if (BunqEnumApiEnvironmentType::CHOICE_PRODUCTION === $this->environment) {
                 $question = new Question('Please enter your bunq API key: ', null);
                 do {
@@ -104,20 +114,26 @@ class InitializeBunqApiCommand extends Command
                     $this->allowedIps
                 );
 
-                $apiContext->save($this->configurationFile);
+                $apiContext->save($tempfile);
             } else {
                 // will create sandbox environment context
                 InstallationUtil::automaticInstall(
                     $environmentType,
-                    $this->configurationFile,
+                    $tempfile,
                     null
                 );
             }
 
-            $output->writeln(sprintf(
-                'Succesfully installed the bunq API key to <info>%s</info>, do not forget to protect this file and to erase your copy/pasted data.',
-                $this->configurationFile
-            ));
+            $contents = \file_get_contents($tempfile);
+
+            $output->writeln('Successfully connected to the bunq API, please provide a password to encrypt the configuration file with. Make it strong!');
+            $this->apiHelper->store($contents, null, $input, $output, $asker);
+
+            if (false === \unlink($tempfile)) {
+                $output->writeln('<error>WARNING: </error> unable to delete temporary installation file, you really should delete this manually: '.$tempfile);
+            } else {
+                $output->writeln('<info>Success!</info>');
+            }
         } catch (\Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }

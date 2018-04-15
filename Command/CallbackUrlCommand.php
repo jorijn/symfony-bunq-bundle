@@ -4,13 +4,14 @@ namespace Jorijn\SymfonyBunqBundle\Command;
 
 use bunq\Exception\BunqException;
 use bunq\Model\Generated\Endpoint\UserCompany;
-use bunq\Model\Generated\Endpoint\UserLight;
 use bunq\Model\Generated\Endpoint\UserPerson;
 use bunq\Model\Generated\Object\NotificationFilter;
+use Jorijn\SymfonyBunqBundle\Component\Command\ApiHelper;
 use Jorijn\SymfonyBunqBundle\Component\Traits\ApiContextAwareTrait;
 use Jorijn\SymfonyBunqBundle\Exception\RuntimeException;
 use Jorijn\SymfonyBunqBundle\Model\User;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
@@ -25,24 +26,26 @@ class CallbackUrlCommand extends Command
 
     use ApiContextAwareTrait;
 
-    /** @var UserCompany|UserLight|UserPerson */
-    protected $user;
     /** @var RouterInterface */
     private $router;
+    /**
+     * @var ApiHelper
+     */
+    private $apiHelper;
 
     /**
      * ListCurrentUserCommand constructor.
      *
      * @param string          $name
-     * @param User            $user
+     * @param ApiHelper       $apiHelper
      * @param RouterInterface $router
      */
-    public function __construct(string $name, User $user, RouterInterface $router)
+    public function __construct(string $name, ApiHelper $apiHelper, RouterInterface $router)
     {
         parent::__construct($name);
 
-        $this->user = $user->getBunqUser();
         $this->router = $router;
+        $this->apiHelper = $apiHelper;
     }
 
     /**
@@ -57,15 +60,23 @@ class CallbackUrlCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
+     * @throws \bunq\Exception\BunqException
+     *
      * @return int|null|void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if (!$this->apiHelper->restore($this->getHelper('question'), $input, $output)) {
+            return;
+        }
+
         $output->writeln(\sprintf('Checking for URL: <info>%s</info>', $this->getUrl()).PHP_EOL);
 
         /** @var QuestionHelper $asker */
         $asker = $this->getHelper('question');
-        $enabled = $this->getCallbackStatus();
+        $user = $this->apiHelper->currentUser();
+
+        $enabled = $this->getCallbackStatus($user);
         $question = new ConfirmationQuestion(
             sprintf(
                 '%s [y/N]: ',
@@ -82,9 +93,9 @@ class CallbackUrlCommand extends Command
 
         try {
             if ($enabled) {
-                $this->disableCallback();
+                $this->disableCallback($user);
             } else {
-                $this->enableCallback();
+                $this->enableCallback($user);
             }
 
             $output->writeln('<info>New status successfully applied.</info>');
@@ -93,9 +104,26 @@ class CallbackUrlCommand extends Command
         }
     }
 
-    protected function getCallbackStatus()
+    /**
+     * @return string
+     */
+    protected function getUrl(): string
     {
-        $allCurrentNotificationFilter = $this->user->getNotificationFilters();
+        return $this->router->generate(
+            self::SYMFONY_BUNQ_CALLBACK_URL,
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
+    protected function getCallbackStatus(User $user): bool
+    {
+        $allCurrentNotificationFilter = $user->getBunqUser()->getNotificationFilters();
 
         /** @var NotificationFilter $filter */
         foreach ($allCurrentNotificationFilter as $filter) {
@@ -111,33 +139,28 @@ class CallbackUrlCommand extends Command
         return false;
     }
 
-    protected function getUrl(): string
-    {
-        return $this->router->generate(
-            self::SYMFONY_BUNQ_CALLBACK_URL,
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-    }
-
-    protected function disableCallback()
+    /**
+     * @param User $user
+     */
+    protected function disableCallback(User $user)
     {
         $callbackUrl = $this->getUrl();
 
         // get the existing filters with the callback url filtered out
-        $allUpdatedNotificationFilter = $this->getExistingFiltersWithoutCurrentCallback($callbackUrl);
+        $allUpdatedNotificationFilter = $this->getExistingFiltersWithoutCurrentCallback($callbackUrl, $user);
 
         $this->updateNotificationFilters($allUpdatedNotificationFilter);
     }
 
     /**
-     * @param $callbackUrl
+     * @param string $callbackUrl
+     * @param User   $user
      *
      * @return NotificationFilter[]
      */
-    protected function getExistingFiltersWithoutCurrentCallback(string $callbackUrl): array
+    protected function getExistingFiltersWithoutCurrentCallback(string $callbackUrl, User $user): array
     {
-        $allCurrentNotificationFilter = $this->user->getNotificationFilters();
+        $allCurrentNotificationFilter = $user->getBunqUser()->getNotificationFilters();
         $allUpdatedNotificationFilter = [];
 
         foreach ($allCurrentNotificationFilter as $notificationFilter) {
@@ -151,10 +174,12 @@ class CallbackUrlCommand extends Command
 
     /**
      * @param NotificationFilter[] $allUpdatedNotificationFilter
+     *
+     * @throws \bunq\Exception\BunqException
      */
     protected function updateNotificationFilters($allUpdatedNotificationFilter = [])
     {
-        switch (\get_class($this->user)) {
+        switch (\get_class($this->apiHelper->currentUser()->getBunqUser())) {
             case UserPerson::class:
                 UserPerson::update(
                     null,
@@ -213,12 +238,12 @@ class CallbackUrlCommand extends Command
         }
     }
 
-    protected function enableCallback()
+    protected function enableCallback(User $user)
     {
         $callbackUrl = $this->getUrl();
 
         // get the existing filters to not override the current filters.
-        $allUpdatedNotificationFilter = $this->getExistingFiltersWithoutCurrentCallback($callbackUrl);
+        $allUpdatedNotificationFilter = $this->getExistingFiltersWithoutCurrentCallback($callbackUrl, $user);
 
         $allUpdatedNotificationFilter[] = new NotificationFilter(
             self::NOTIFICATION_DELIVERY_METHOD_URL,
