@@ -5,7 +5,7 @@
   "require": {
     "symfony/symfony": "3.4.*",
     "bunq/sdk_php": "0.13.*",
-    "php": "^7.0.13",
+    "php": "^7.1",
     "ext-openssl": "*"
   },
   "require-dev": {
