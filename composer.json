@@ -4,7 +4,7 @@
   "type": "library",
   "require": {
     "symfony/symfony": "3.4.*",
-    "bunq/sdk_php": "0.13.*",
+    "bunq/sdk_php": "^1.0",
     "php": "^7.1",
     "ext-openssl": "*"
   },
